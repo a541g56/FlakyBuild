@@ -22,6 +22,8 @@ public class test {
         String jsonDataPath = "D:/WorkSpace/maven_FlakyBuild/data/results.json";
         //clone代码存放的文件位置
         String dataSetPath = "D:/WorkSpace/FlakyDataSet/";
+        //clone代码存放的文件位置
+        String pushPath = "D:/WorkSpace/FlakyDataSet/_blank/FlakyBuild/";
         //将查询到的commit信息和包含关键字的代码信息写入的文件的路径
         String writePath = "C:/Users/10247/Desktop/flaky_Message.txt";
         //关键字列表
@@ -38,6 +40,8 @@ public class test {
         //根据对java代码进行筛选，查找包含关键字的信息
         OperationUtils.SearchCodeByWords(dataSetPath,keyWords,writePath);
 
+        //自动push代码
+        //OperationUtils.antoPush(jsonDataPath,pushPath,dataSetPath);
 
     }
 }

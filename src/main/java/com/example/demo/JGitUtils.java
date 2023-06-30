@@ -90,28 +90,7 @@ public class JGitUtils {
         return commits;
     }
 
-    //自动push代码
-    public static void autoPushByShell(String path,String name) {
-        //对待提交数据做出更改
-        File file = new File(path + "/add.txt");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            BufferedWriter bf = null;
-            try {
-                bf = new BufferedWriter(new FileWriter(file, true));
-                bf.write("1");
-                bf.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        ShellCommandUtils.GitPusher(name);
-    }
+
 /*
 
     //自动push代码

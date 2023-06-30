@@ -55,6 +55,7 @@ public class FileUtils {
             while ((thisLine = bfr.readLine()) != null) {
                 content.add(thisLine);
             }
+            bfr.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,24 +64,24 @@ public class FileUtils {
     }
 
     //在待提交文件夹删除上一个项目，导入下一个项目内容
-    public static void deleteAndCopy(String path, String inPath){
+    public static void deleteAndCopy(String deletePath, String inPath){
         try {
-            File file = new File(path);
+            File file = new File(deletePath);
             File[] files = file.listFiles();
             for (File f :files){
-                if (!(f.getName().equals(".git")||f.getName().equals("git-push.sh"))){
+                if (!f.getName().equals(".git")){
                     delete(f.getAbsolutePath());
                 }
             }
             File inFile = new File(inPath);
+            logger.info(inPath);
             File[] inFiles = inFile.listFiles();
             for (File f :inFiles){
                 if (!f.getName().equals(".git")){
-                    System.out.println(f.getName());
                    if(!f.isFile()){
-                       org.apache.commons.io.FileUtils.copyDirectoryToDirectory(new File(f.getAbsolutePath()),new File(path));
+                       org.apache.commons.io.FileUtils.copyDirectoryToDirectory(new File(f.getAbsolutePath()),new File(deletePath));
                    }else{
-                       org.apache.commons.io.FileUtils.copyFileToDirectory(new File(f.getAbsolutePath()),new File(path));
+                       org.apache.commons.io.FileUtils.copyFileToDirectory(new File(f.getAbsolutePath()),new File(deletePath));
                    }
 
                 }
@@ -93,34 +94,45 @@ public class FileUtils {
 
     //将workflow的提交触发分支更改为项目名。
     public static void changePushBranch(String path,String branchName){
-        ArrayList<String> list = getContent(path);
-        int begin = 0,flag = 0;
-        for(int i = 0;i<list.size();i++){
-            //找到on：的行
-            if(list.get(i).equals("on:")){
-                begin = i;
-                flag = 1;
+        File file = new File(path);
+        logger.info(path);
+        File[] listFile = file.listFiles();
+
+        for(File temp :listFile){
+            logger.info(temp.getAbsolutePath());
+            //在workflow下是文件夹
+            if(!temp.isFile()){
                 continue;
             }
-            if(list.get(i).equals("jobs:")){
-                break;
-            }
-            //删除on：到jobs：的内容
-            if (flag == 1){
-                list.set(i,"");
-            }
 
-        }
-        list.add(begin+1,"  push:");
-        list.add(begin+2,"    branches:["+branchName+"]");
-        try {
-            BufferedWriter out = new BufferedWriter(new FileWriter(path));
-            for(String s : list){
-                out.write(s+"\n");
-            }
-            out.close();
-        } catch (IOException e) {
-        }
+            ArrayList<String> list = getContent(temp.getAbsolutePath());
+            int begin = 0,flag = 0;
+            for(int i = 0;i<list.size();i++){
+                //找到on：的行
+                if(list.get(i).equals("on:")){
+                    begin = i;
+                    flag = 1;
+                    continue;
+                }
+                if(list.get(i).equals("jobs:")){
+                    break;
+                }
+                //删除on：到jobs：的内容
+                if (flag == 1){
+                    list.set(i,"");
+                }
 
+            }
+            list.add(begin+1,"  push:");
+            list.add(begin+2,"    branches: [ "+branchName+" ]");
+            try {
+                BufferedWriter out = new BufferedWriter(new FileWriter(temp.getAbsolutePath()));
+                for(String s : list){
+                    out.write(s+"\n");
+                }
+                out.close();
+            } catch (IOException e) {
+            }
+        }
     }
 }
