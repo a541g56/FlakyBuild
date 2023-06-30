@@ -3,8 +3,5 @@ HELP.md
 /build
 /.idea
 /out
-/gradle
-gradlew
-gradlew.bat
-settings.gradle
+
 
